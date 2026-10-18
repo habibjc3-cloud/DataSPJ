@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rekap SPJ - EPSIMAC</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Container Utama -->
+    <div class="main-container">
+      <!-- Header Judul -->
+      <header class="header-text">
+        <h1>HALLO</h1>
+        <h2>WARGA EPSIMAC</h2>
+      </header>
+
+      <!-- Logo -->
+      <div class="logo-container">
+        <img
+          src="image/logo.jpeg"
+          alt="Logo PT Epsima Concordia Rekatama"
+          class="logo-img"
+        />
+      </div>
+
+      <!-- Sub Judul -->
+      <div class="sub-header">
+        <h3>AYO REKAP SPJ</h3>
+      </div>
+
+      <!-- Custom Dropdown Pilih Project -->
+      <div class="custom-dropdown" id="customDropdown">
+        <div class="dropdown-button" onclick="toggleProjectDropdown()">
+          <span id="selectedOption">PILIH PROJECT</span>
+        </div>
+        <div class="dropdown-menu" id="dropdownMenu">
+          <div class="dropdown-item" onclick="selectProject('JC 3', 'jc3')">
+            JC 3
+          </div>
+          <div class="dropdown-item" onclick="selectProject('JC 4', 'jc4')">
+            JC 4
+          </div>
+        </div>
+      </div>
+
+      <!-- Tombol Lanjut -->
+      <button class="btn-lanjut" id="btnLanjut" onclick="openModal()">
+        LANJUT
+      </button>
+    </div>
+    <!-- Penutup .main-container -->
+
+    <!-- Modal Pop-Up Data & Ranking -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-container">
+        <!-- Panel Kiri: Form DATA -->
+        <div class="modal-panel panel-data">
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+          <h2 class="panel-title">DATA</h2>
+
+          <form id="spjForm" onsubmit="handleFormSubmit(event)">
+            <!-- Custom Dropdown NAMA -->
+            <div class="form-group">
+              <div class="custom-dropdown-modal" id="dropdownNamaContainer">
+                <div
+                  class="dropdown-button-modal"
+                  onclick="toggleNamaDropdown()"
+                >
+                  <span id="selectedNama">NAMA</span>
+                </div>
+                <div class="dropdown-menu-modal" id="dropdownNamaMenu">
+                  <div
+                    class="dropdown-item-modal"
+                    onclick="selectNama('Habib')"
+                  >
+                    Habib
+                  </div>
+                  <div
+                    class="dropdown-item-modal"
+                    onclick="selectNama('Raditya')"
+                  >
+                    Raditya
+                  </div>
+                  <div
+                    class="dropdown-item-modal"
+                    onclick="selectNama('Nur Abdi')"
+                  >
+                    Nur Abdi
+                  </div>
+                  <div
+                    class="dropdown-item-modal"
+                    onclick="selectNama('Rizki')"
+                  >
+                    Rizki
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="inputNamaValue" name="nama" required />
+            </div>
+
+            <!-- Input TANGGAL NOTA -->
+            <div class="form-group">
+              <input
+                type="date"
+                class="form-input"
+                id="inputTanggal"
+                onchange="checkFormStatus()"
+                required
+              />
+            </div>
+
+            <!-- Input DESKRIPSI/KETERANGAN -->
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-input"
+                id="inputDeskripsi"
+                placeholder="DESKRIPSI/KETERANGAN"
+                oninput="checkFormStatus()"
+                required
+              />
+            </div>
+
+            <!-- Custom Dropdown PENGELUARAN / PEMASUKAN -->
+            <div class="form-group">
+              <div class="custom-dropdown-modal" id="dropdownJenisContainer">
+                <div
+                  class="dropdown-button-modal"
+                  onclick="toggleJenisDropdown()"
+                >
+                  <span id="selectedJenis">PENGELUARAN / PEMASUKAN</span>
+                </div>
+                <div class="dropdown-menu-modal" id="dropdownJenisMenu">
+                  <div
+                    class="dropdown-item-modal"
+                    onclick="selectJenis('PENGELUARAN')"
+                  >
+                    PENGELUARAN
+                  </div>
+                  <div
+                    class="dropdown-item-modal"
+                    onclick="selectJenis('PEMASUKAN')"
+                  >
+                    PEMASUKAN
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="inputJenisValue" name="jenis" required />
+            </div>
+
+            <!-- Grid 2 Kolom: JUMLAH & SATUAN -->
+            <div class="form-row">
+              <div class="form-group col-6">
+                <input
+                  type="number"
+                  class="form-input"
+                  id="inputJumlah"
+                  placeholder="JUMLAH"
+                  oninput="
+                    hitungTotal();
+                    checkFormStatus();
+                  "
+                  required
+                />
+              </div>
+              <div class="form-group col-6">
+                <input
+                  type="text"
+                  class="form-input"
+                  id="inputSatuan"
+                  placeholder="SATUAN (e.g. sak, pcs, hr)"
+                  oninput="checkFormStatus()"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Grid 2 Kolom: HARGA SATUAN & TOTAL HARGA -->
+            <div class="form-row">
+              <div class="form-group col-6">
+                <input
+                  type="number"
+                  class="form-input"
+                  id="inputHargaSatuan"
+                  placeholder="HARGA SATUAN"
+                  oninput="
+                    hitungTotal();
+                    checkFormStatus();
+                  "
+                  required
+                />
+              </div>
+              <div class="form-group col-6">
+                <input
+                  type="text"
+                  class="form-input input-readonly"
+                  id="inputTotalHarga"
+                  placeholder="TOTAL HARGA"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <!-- Upload Bukti (Merah -> Hijau) -->
+            <div class="form-group">
+              <label
+                for="fileBukti"
+                class="status-btn btn-red"
+                id="uploadLabel"
+              >
+                <span id="uploadText">UNGGAH BUKTI</span>
+              </label>
+              <input
+                type="file"
+                id="fileBukti"
+                accept="image/*"
+                onchange="handleFileUpload(this)"
+                required
+              />
+            </div>
+
+            <!-- Tombol Selesai (Merah -> Hijau) -->
+            <button
+              type="submit"
+              class="status-btn btn-red"
+              id="btnSelesai"
+              disabled
+            >
+              SELESAI
+            </button>
+          </form>
+        </div>
+
+        <!-- Panel Kanan: RANKING -->
+        <div class="modal-panel panel-ranking">
+          <h2 class="panel-title">RANKING</h2>
+          <div class="ranking-content">
+            <p class="ranking-placeholder">
+              Daftar rekap/ranking akan muncul di sini.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Banner Bottom -->
+    <footer class="footer-banner">
+      <div class="footer-content">
+        <span>HABIB</span>
+        <span class="copyright-icon">&copy;</span>
+        <span>2026</span>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
