@@ -1,0 +1,197 @@
+// Trigger Otomatis: Dijalankan setiap kali ada perubahan manual di Spreadsheet (seperti hapus baris/edit)
+function onEdit(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheetData = ss.getActiveSheet();
+    
+    // Hanya jalankan jika perubahan terjadi di sheet 'SPJ w3'
+    if (sheetData.getName() === "SPJ w3") {
+      rapikanDanSusunLampiran(ss, sheetData);
+    }
+  } catch (err) {
+    console.error("Error onEdit: " + err.toString());
+  }
+}
+
+// Fungsi Utama Penyusun Ulang Data, Nomor Urut, Sisa Dana, dan Lampiran Foto
+function rapikanDanSusunLampiran(ss, sheetData) {
+  var startRow = 8;
+  var lastRow = sheetData.getLastRow();
+
+  // 1. Hapus Baris Ringkasan Total Lama jika ada
+  if (lastRow >= startRow) {
+    for (var r = lastRow; r >= startRow; r--) {
+      var valI = sheetData.getRange(r, 9).getValue().toString().toUpperCase();
+      if (valI.indexOf("TOTAL") !== -1 || valI.indexOf("SISA DANA") !== -1) {
+        sheetData.deleteRow(r);
+      }
+    }
+  }
+
+  var updatedLastRow = sheetData.getLastRow();
+  var numRows = updatedLastRow - startRow + 1;
+  
+  if (numRows > 0) {
+    // 2. Rapikan Nomor Urut & Formula Total Harga
+    for (var i = 0; i < numRows; i++) {
+      var currentRow = startRow + i;
+      sheetData.getRange(currentRow, 1).setValue(i + 1); // Set NO: 1, 2, 3, dst.
+      sheetData.getRange(currentRow, 10).setFormula("=G" + currentRow + "*I" + currentRow);
+    }
+
+    // 3. Tulis Baris Summary di Paling Bawah
+    var endDataRow = startRow + numRows - 1;
+    var rowPemasukan = endDataRow + 1;
+    var rowPengeluaran = endDataRow + 2;
+    var rowSisaDana = endDataRow + 3;
+
+    sheetData.getRange(rowPemasukan, 9).setValue("TOTAL PEMASUKAN").setFontWeight("bold");
+    sheetData.getRange(rowPemasukan, 10).setFormula('=SUMIF(F' + startRow + ':F' + endDataRow + '; "PEMASUKAN"; J' + startRow + ':J' + endDataRow + ')').setFontWeight("bold");
+
+    sheetData.getRange(rowPengeluaran, 9).setValue("TOTAL PENGELUARAN").setFontWeight("bold");
+    sheetData.getRange(rowPengeluaran, 10).setFormula('=SUMIF(F' + startRow + ':F' + endDataRow + '; "PENGELUARAN"; J' + startRow + ':J' + endDataRow + ')').setFontWeight("bold");
+
+    sheetData.getRange(rowSisaDana, 9).setValue("SISA DANA").setFontWeight("bold");
+    sheetData.getRange(rowSisaDana, 10).setFormula('=J' + rowPemasukan + '-J' + rowPengeluaran).setFontWeight("bold");
+
+    sheetData.getRange(rowPemasukan, 10, 3, 1).setNumberFormat('"Rp"#,##0');
+  }
+
+  // 4. SUSUN ULANG TAB 'Lampiran w3' DARI AWAL
+  var sheetLampiran = ss.getSheetByName("Lampiran w3");
+  if (sheetLampiran) {
+    var lampiranLastRow = sheetLampiran.getLastRow();
+    if (lampiranLastRow >= 1) {
+      sheetLampiran.getRange(1, 1, lampiranLastRow, 5).clearContent();
+    }
+
+    if (numRows > 0) {
+      for (var j = 0; j < numRows; j++) {
+        var noUrut = j + 1;
+        var rowInSheet = startRow + j;
+        var imgUrlInRow = sheetData.getRange(rowInSheet, 12).getValue();
+
+        var colIndex = ((noUrut - 1) % 5) + 1;
+        var rowIndex = (Math.floor((noUrut - 1) / 5) * 2) + 2;
+
+        sheetLampiran.getRange(rowIndex - 1, colIndex).setValue(noUrut);
+        if (imgUrlInRow) {
+          sheetLampiran.getRange(rowIndex, colIndex).setFormula('=IMAGE("' + imgUrlInRow + '"; 1)');
+        }
+      }
+    }
+  }
+}
+
+// Fungsi doGet untuk Ambil Leaderboard di Web
+function doGet(e) {
+  try {
+    var ss = SpreadsheetApp.openById("1KbUbnh_arBjCjeZ11EqIhDONZQ946vy5otk3XVilLDg");
+    var sheetData = ss.getSheetByName("SPJ w3");
+    if (!sheetData) sheetData = ss.getSheets()[0];
+
+    var startRow = 8;
+    var lastRow = sheetData.getLastRow();
+    var totals = {};
+
+    if (lastRow >= startRow) {
+      var data = sheetData.getRange(startRow, 1, lastRow - startRow + 1, 11).getValues();
+      
+      for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        var deskripsi = row[3] ? row[3].toString().toUpperCase() : "";
+        if (deskripsi.indexOf("TOTAL") !== -1 || deskripsi.indexOf("SISA DANA") !== -1) continue;
+
+        var jenis = row[5] ? row[5].toString().toUpperCase() : "";
+        var totalHarga = Number(row[9]) || 0;
+        var pic = row[10];
+
+        if (pic && pic.toString().trim() !== "" && jenis === "PENGELUARAN") {
+          pic = pic.toString().trim();
+          if (!totals[pic]) totals[pic] = 0;
+          totals[pic] += totalHarga;
+        }
+      }
+    }
+
+    var rankingArray = [];
+    for (var name in totals) {
+      rankingArray.push({ nama: name, total: totals[name] });
+    }
+    rankingArray.sort(function(a, b) { return b.total - a.total; });
+
+    return ContentService.createTextOutput(JSON.stringify({ result: "success", ranking: rankingArray })).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ result: "error", error: error.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Fungsi doPost untuk Upload Baru dari Web
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    
+    var folderId = "1SFOM_zJUJA4HeZj_RH8WHa3Kkzy2h4ma";
+    var folder = DriveApp.getFolderById(folderId);
+    
+    var contentType = data.fileData.substring(5, data.fileData.indexOf(';base64'));
+    var bytes = Utilities.base64Decode(data.fileData.substr(data.fileData.indexOf('base64,') + 7));
+    var blob = Utilities.newBlob(bytes, contentType, data.fileName);
+    var file = folder.createFile(blob);
+    
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    var imageUrl = "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w1000";
+
+    var ss = SpreadsheetApp.openById("1KbUbnh_arBjCjeZ11EqIhDONZQ946vy5otk3XVilLDg");
+    var sheetData = ss.getSheetByName("SPJ w3");
+    if (!sheetData) sheetData = ss.getSheets()[0];
+    
+    var startRow = 8;
+    var lastRow = sheetData.getLastRow();
+
+    // Hapus ringkasan lama
+    if (lastRow >= startRow) {
+      for (var r = lastRow; r >= startRow; r--) {
+        var valI = sheetData.getRange(r, 9).getValue().toString().toUpperCase();
+        if (valI.indexOf("TOTAL") !== -1 || valI.indexOf("SISA DANA") !== -1) {
+          sheetData.deleteRow(r);
+        }
+      }
+    }
+
+    var currentLastRow = sheetData.getLastRow();
+    var targetRow = (currentLastRow < startRow) ? startRow : currentLastRow + 1;
+
+    var dateParts = data.tanggal.split("-");
+    var tglObject = (dateParts[0].length === 4) 
+      ? new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]))
+      : new Date(Number(dateParts[2]), Number(dateParts[1]) - 1, Number(dateParts[0]));
+
+    sheetData.getRange(targetRow, 2).setValue(tglObject).setNumberFormat("dd-mm-yyyy");
+    sheetData.getRange(targetRow, 4).setValue(data.deskripsi);
+    sheetData.getRange(targetRow, 5).setValue(data.project);
+    sheetData.getRange(targetRow, 6).setValue(data.jenis);
+    sheetData.getRange(targetRow, 7).setValue(Number(data.jumlah));
+    sheetData.getRange(targetRow, 8).setValue(data.satuan);
+    sheetData.getRange(targetRow, 9).setValue(Number(data.hargaSatuan));
+    sheetData.getRange(targetRow, 10).setFormula("=G" + targetRow + "*I" + targetRow);
+    sheetData.getRange(targetRow, 11).setValue(data.pic);
+    sheetData.getRange(targetRow, 12).setValue(imageUrl);
+
+    // Auto Sort Tanggal
+    var updatedLastRow = sheetData.getLastRow();
+    var numRows = updatedLastRow - startRow + 1;
+    if (numRows > 0) {
+      var fullRange = sheetData.getRange(startRow, 1, numRows, 12);
+      fullRange.sort({column: 2, ascending: true});
+    }
+
+    // Panggil perapihan & penyusunan lampiran
+    rapikanDanSusunLampiran(ss, sheetData);
+
+    return ContentService.createTextOutput(JSON.stringify({ result: "success", message: "Data & Lampiran Berhasil Disusun!" })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ result: "error", error: error.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
+}

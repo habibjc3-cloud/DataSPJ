@@ -1,6 +1,12 @@
 const WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbzc37xjEXFoWqJ4nM5hiUt5Rv4KJSFI__WPvHC00NPWlFusnyd3ipD-hkwy7cP3K1HV/exec";
 
+// Daftar nama berdasarkan Project
+const projectNames = {
+  "JC 3": ["Habib", "Raditya", "Nur Abdi", "Rizki", "Fahrul", "Yoko"],
+  "JC 4": ["Fakhri", "Roni"],
+};
+
 let selectedProjectValue = "";
 
 function toggleProjectDropdown() {
@@ -8,16 +14,43 @@ function toggleProjectDropdown() {
   menu.classList.toggle("show");
 }
 
-function selectProject(label, value) {
+function selectProject(label) {
   document.getElementById("selectedOption").innerText = label;
   document.getElementById("dropdownMenu").classList.remove("show");
   selectedProjectValue = label;
+
+  // Reset pilihan nama setiap kali project diganti
+  document.getElementById("selectedNama").innerText = "NAMA";
+  document.getElementById("inputNamaValue").value = "";
+
+  // Generate opsi nama sesuai project
+  populateNamaDropdown(label);
 
   const btnLanjut = document.getElementById("btnLanjut");
   btnLanjut.classList.add("visible");
 }
 
+function populateNamaDropdown(projectLabel) {
+  const menuNama = document.getElementById("dropdownNamaMenu");
+  menuNama.innerHTML = "";
+
+  const names = projectNames[projectLabel] || [];
+  names.forEach((nama) => {
+    const item = document.createElement("div");
+    item.className = "dropdown-item-modal";
+    item.innerText = nama;
+    item.onclick = function () {
+      selectNama(nama);
+    };
+    menuNama.appendChild(item);
+  });
+}
+
 function toggleNamaDropdown() {
+  if (!selectedProjectValue) {
+    alert("Silakan pilih Project terlebih dahulu di halaman utama!");
+    return;
+  }
   const menu = document.getElementById("dropdownNamaMenu");
   menu.classList.toggle("show");
 }
@@ -106,14 +139,13 @@ function checkFormStatus() {
   }
 }
 
-// FUNGSI UNTUK MENGAMBIL DATA RANKING DARI SPREADSHEET
 function loadRanking() {
   const container = document.querySelector(".ranking-content");
   if (!container) return;
 
   container.innerHTML = "<p class='ranking-placeholder'>Memuat ranking...</p>";
 
-  fetch(WEB_APP_URL)
+  fetch(WEB_APP_URL + "?project=" + encodeURIComponent(selectedProjectValue))
     .then((res) => res.json())
     .then((data) => {
       if (
@@ -123,7 +155,6 @@ function loadRanking() {
       ) {
         let html = "";
         data.ranking.forEach((item, index) => {
-          // Jumlah bintang berdasarkan ranking (Juara 1 = ⭐⭐⭐, Juara 2 = ⭐⭐, dst)
           let stars = "";
           if (index === 0) stars = " ⭐⭐⭐";
           else if (index === 1) stars = " ⭐⭐";
@@ -159,7 +190,7 @@ function openModal() {
     tglInput.value = today;
   }
   checkFormStatus();
-  loadRanking(); // Panggil data ranking setiap kali modal dibuka
+  loadRanking();
 }
 
 function closeModal() {
@@ -201,7 +232,7 @@ function handleFormSubmit(event) {
         if (data.result === "success") {
           alert("Data dan Nota Berhasil Terupload!");
           resetForm();
-          loadRanking(); // Reload ranking setelah data baru dikirim
+          loadRanking();
           closeModal();
         } else {
           alert("Gagal menyimpan data: " + data.error);
@@ -233,34 +264,33 @@ function resetForm() {
   checkFormStatus();
 }
 
-window.onclick = function (event) {
-  if (
-    !event.target.matches(".dropdown-button") &&
-    !event.target.matches("#selectedOption")
-  ) {
-    const menuProject = document.getElementById("dropdownMenu");
-    if (menuProject && menuProject.classList.contains("show")) {
-      menuProject.classList.remove("show");
-    }
+// --- FUNGSI MODAL PIN DOWNLOAD EXCEL ---
+const KODE_PIN_RAHASIA = "2026"; // PIN rahasia (bisa diubah sesuai keinginan)
+
+function bukaModalPin() {
+  document.getElementById("modalPinOverlay").style.display = "flex";
+  document.getElementById("inputPinRahasia").value = "";
+  document.getElementById("inputPinRahasia").focus();
+}
+
+function tutupModalPin() {
+  document.getElementById("modalPinOverlay").style.display = "none";
+}
+
+function verifikasiPinDanDownload() {
+  const pinInput = document.getElementById("inputPinRahasia").value;
+
+  if (pinInput !== KODE_PIN_RAHASIA) {
+    alert("Kode PIN salah! Akses download ditolak.");
+    return;
   }
 
-  if (
-    !event.target.matches(".dropdown-button-modal") &&
-    !event.target.matches("#selectedNama")
-  ) {
-    const menuNama = document.getElementById("dropdownNamaMenu");
-    if (menuNama && menuNama.classList.contains("show")) {
-      menuNama.classList.remove("show");
-    }
-  }
-
-  if (
-    !event.target.matches(".dropdown-button-modal") &&
-    !event.target.matches("#selectedJenis")
-  ) {
-    const menuJenis = document.getElementById("dropdownJenisMenu");
-    if (menuJenis && menuJenis.classList.contains("show")) {
-      menuJenis.classList.remove("show");
-    }
-  }
-};
+  tutupModalPin();
+  // Langsung download file Excel tanpa memicu izin akun Google
+  window.open(
+    WEB_APP_URL +
+      "?action=downloadExcel&project=" +
+      encodeURIComponent(selectedProjectValue),
+    "_blank",
+  );
+}

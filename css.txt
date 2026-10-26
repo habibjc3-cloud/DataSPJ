@@ -1,0 +1,512 @@
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* Container Utama */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  padding: 40px 20px;
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* Header Text */
+.header-text h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #000000;
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+
+.header-text h2 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #000000;
+  letter-spacing: 1.5px;
+  margin-bottom: 25px;
+}
+
+/* Logo */
+.logo-container {
+  margin-bottom: 20px;
+}
+
+.logo-img {
+  max-width: 180px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Sub Header */
+.sub-header h3 {
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: #222222;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+}
+
+/* Custom Dropdown Project */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+}
+
+.dropdown-button {
+  width: 100%;
+  padding: 14px 20px;
+  background-color: #2b5b8d;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border-radius: 25px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease;
+  user-select: none;
+}
+
+.dropdown-button:hover {
+  background-color: #21466d;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  z-index: 50;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+
+.dropdown-item {
+  padding: 12px 20px;
+  color: #333333;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #2b5b8d;
+  color: #ffffff;
+}
+
+/* Tombol LANJUT (Lurus Center) */
+.btn-lanjut {
+  display: none;
+  margin: 18px auto 0 auto;
+  width: 100%;
+  max-width: 200px;
+  padding: 12px 20px;
+  background-color: #2b5b8d;
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease;
+  text-align: center;
+}
+
+.btn-lanjut:hover {
+  background-color: #21466d;
+}
+
+.btn-lanjut:active {
+  transform: scale(0.98);
+}
+
+.btn-lanjut.visible {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+/* ========================================== */
+/* MODAL POP-UP (DATA & RANKING)              */
+/* ========================================== */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+}
+
+.modal-overlay.active {
+  display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+  display: flex;
+  width: 100%;
+  max-width: 820px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  min-height: 450px;
+}
+
+/* Panel Kiri: DATA */
+.panel-data {
+  position: relative;
+  width: 55%;
+  background-color: #2b5b8d;
+  color: #ffffff;
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  left: 15px;
+  background: #ffffff;
+  color: #2b5b8d;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.panel-title {
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.col-6 {
+  flex: 1;
+}
+
+/* Custom Dropdown (Nama & Jenis) */
+.custom-dropdown-modal {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-button-modal {
+  width: 100%;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 20px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dropdown-menu-modal {
+  display: none;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 60;
+  overflow: hidden;
+}
+
+.dropdown-menu-modal.show {
+  display: block;
+}
+
+.dropdown-item-modal {
+  padding: 8px 12px;
+  color: #333333;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+
+.dropdown-item-modal:hover {
+  background-color: #2b5b8d;
+  color: #ffffff;
+}
+
+/* Input Fields */
+.form-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  color: #333333;
+}
+
+.form-input::placeholder {
+  color: #666666;
+  font-weight: 600;
+}
+
+.input-readonly {
+  background-color: #e2e8f0;
+  color: #1a202c;
+  font-weight: 700;
+}
+
+/* Common Styling untuk Tombol Status (Upload Bukti & Selesai) */
+input[type="file"] {
+  display: none;
+}
+
+.status-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease;
+}
+
+/* Status Merah vs Hijau */
+.btn-red {
+  background-color: #ff5252;
+  color: #ffffff;
+}
+
+.btn-green {
+  background-color: #2ed573;
+  color: #ffffff;
+}
+
+.status-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+
+/* Panel Kanan: RANKING */
+.panel-ranking {
+  width: 45%;
+  background-color: #cbcfd4;
+  color: #000000;
+  padding: 25px 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-ranking .panel-title {
+  color: #000000;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.ranking-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column; /* Diubah agar list item ranking tersusun ke bawah */
+  gap: 12px; /* Jarak antar kotakan nama */
+  overflow-y: auto; /* Supaya bisa di-scroll kalau datanya banyak */
+}
+
+.ranking-placeholder {
+  color: #555555;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: auto;
+}
+
+/* Kotakan Item Nama & Total Harga di Ranking */
+.ranking-item {
+  background-color: #ffffff;
+  color: #333333;
+  padding: 14px 18px;
+  border-radius: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.95rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+.ranking-name {
+  color: #000;
+}
+
+.ranking-stars {
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+
+/* Footer Banner */
+.footer-banner {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.footer-content {
+  background-color: #0d1240;
+  color: #ffffff;
+  width: 50%;
+  max-width: 350px;
+  padding: 8px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  clip-path: polygon(6% 0%, 94% 0%, 100% 100%, 0% 100%);
+}
+
+.copyright-icon {
+  font-size: 1rem;
+}
+
+/* Animasi */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+  .modal-container {
+    flex-direction: column;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .panel-data,
+  .panel-ranking {
+    width: 100%;
+  }
+
+  .panel-ranking {
+    min-height: 180px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .main-container {
+    padding: 20px 15px;
+  }
+
+  .header-text h1 {
+    font-size: 1.5rem;
+  }
+  .header-text h2 {
+    font-size: 1.7rem;
+    margin-bottom: 15px;
+  }
+  .logo-img {
+    max-width: 140px;
+  }
+  .sub-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  .custom-dropdown {
+    max-width: 280px;
+  }
+  .dropdown-button {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+
+  .footer-content {
+    width: 80%;
+    max-width: 280px;
+    font-size: 0.8rem;
+    padding: 7px 0;
+    clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%);
+  }
+}

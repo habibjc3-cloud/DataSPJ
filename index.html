@@ -35,12 +35,8 @@
           <span id="selectedOption">PILIH PROJECT</span>
         </div>
         <div class="dropdown-menu" id="dropdownMenu">
-          <div class="dropdown-item" onclick="selectProject('JC 3', 'jc3')">
-            JC 3
-          </div>
-          <div class="dropdown-item" onclick="selectProject('JC 4', 'jc4')">
-            JC 4
-          </div>
+          <div class="dropdown-item" onclick="selectProject('JC 3')">JC 3</div>
+          <div class="dropdown-item" onclick="selectProject('JC 4')">JC 4</div>
         </div>
       </div>
 
@@ -60,7 +56,7 @@
           <h2 class="panel-title">DATA</h2>
 
           <form id="spjForm" onsubmit="handleFormSubmit(event)">
-            <!-- Custom Dropdown NAMA -->
+            <!-- Custom NAMA (Dinamis berdasarkan Project) -->
             <div class="form-group">
               <div class="custom-dropdown-modal" id="dropdownNamaContainer">
                 <div
@@ -70,36 +66,7 @@
                   <span id="selectedNama">NAMA</span>
                 </div>
                 <div class="dropdown-menu-modal" id="dropdownNamaMenu">
-                  <div
-                    class="dropdown-item-modal"
-                    onclick="selectNama('Habib')"
-                  >
-                    Habib
-                  </div>
-                  <div
-                    class="dropdown-item-modal"
-                    onclick="selectNama('Raditya')"
-                  >
-                    Raditya
-                  </div>
-                  <div
-                    class="dropdown-item-modal"
-                    onclick="selectNama('Nur Abdi')"
-                  >
-                    Nur Abdi
-                  </div>
-                  <div
-                    class="dropdown-item-modal"
-                    onclick="selectNama('Rizki')"
-                  >
-                    Rizki
-                  </div>
-                  <div
-                    class="dropdown-item-modal"
-                    onclick="selectNama('Fahrul')"
-                  >
-                    Fahrul
-                  </div>
+                  <!-- Diisi otomatis oleh JavaScript -->
                 </div>
               </div>
               <input type="hidden" id="inputNamaValue" name="nama" required />
@@ -238,7 +205,7 @@
           </form>
         </div>
 
-        <!-- Panel Kanan: RANKING -->
+        <!-- Panel Kanan: RANKING & TOMBOL DOWNLOAD EXCEL -->
         <div class="modal-panel panel-ranking">
           <h2 class="panel-title">RANKING</h2>
           <div class="ranking-content">
@@ -246,6 +213,30 @@
               Daftar rekap/ranking akan muncul di sini.
             </p>
           </div>
+          <!-- Tombol Download Excel Merah -->
+          <button class="btn-download-excel" onclick="bukaModalPin()">
+            DOWNLOAD LAPORAN EXCEL
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL POP-UP INPUT PIN -->
+    <div class="modal-pin-overlay" id="modalPinOverlay">
+      <div class="modal-pin-box">
+        <h3>Masukkan PIN Akses</h3>
+        <p>Masukkan kode PIN rahasia untuk mendownload laporan Excel.</p>
+        <input
+          type="password"
+          id="inputPinRahasia"
+          placeholder="••••"
+          maxlength="6"
+        />
+        <div class="modal-pin-actions">
+          <button onclick="tutupModalPin()" class="btn-batal">Batal</button>
+          <button onclick="verifikasiPinDanDownload()" class="btn-konfirmasi">
+            Download
+          </button>
         </div>
       </div>
     </div>

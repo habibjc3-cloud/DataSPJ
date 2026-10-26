@@ -131,7 +131,7 @@ body {
   color: #ffffff;
 }
 
-/* Tombol LANJUT (Lurus Center Presisi) */
+/* Tombol LANJUT */
 .btn-lanjut {
   display: none;
   margin: 18px auto 0 auto;
@@ -166,9 +166,7 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
-/* ========================================== */
-/* MODAL POP-UP (DATA & RANKING)              */
-/* ========================================== */
+/* MODAL POP-UP (DATA & RANKING) */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -252,7 +250,7 @@ body {
   flex: 1;
 }
 
-/* Custom Dropdown Dalam Modal (Nama & Jenis) */
+/* Custom Dropdown (Nama & Jenis) */
 .custom-dropdown-modal {
   position: relative;
   width: 100%;
@@ -327,7 +325,7 @@ body {
   font-weight: 700;
 }
 
-/* Common Styling untuk Tombol Status (Upload Bukti & Selesai) */
+/* Tombol Status */
 input[type="file"] {
   display: none;
 }
@@ -348,7 +346,6 @@ input[type="file"] {
     transform 0.1s ease;
 }
 
-/* Status Merah vs Hijau */
 .btn-red {
   background-color: #ff5252;
   color: #ffffff;
@@ -383,9 +380,10 @@ input[type="file"] {
 .ranking-content {
   flex-grow: 1;
   display: flex;
-  flex-direction: column; /* Diubah agar list item ranking tersusun ke bawah */
-  gap: 12px; /* Jarak antar kotakan nama */
-  overflow-y: auto; /* Supaya bisa di-scroll kalau datanya banyak */
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: 250px;
 }
 
 .ranking-placeholder {
@@ -395,17 +393,16 @@ input[type="file"] {
   margin: auto;
 }
 
-/* Kotakan Item Nama & Total Harga di Ranking */
 .ranking-item {
   background-color: #ffffff;
   color: #333333;
-  padding: 14px 18px;
+  padding: 12px 15px;
   border-radius: 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
 }
 
@@ -414,8 +411,97 @@ input[type="file"] {
 }
 
 .ranking-stars {
+  font-size: 1rem;
+  letter-spacing: 1px;
+}
+
+/* Tombol Download Merah di Panel Kanan */
+.btn-download-excel {
+  margin-top: 15px;
+  background-color: #ff5252;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  letter-spacing: 1px;
+}
+
+.btn-download-excel:hover {
+  background-color: #ff3333;
+}
+
+/* MODAL PIN OVERLAY */
+.modal-pin-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-pin-box {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-pin-box h3 {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.modal-pin-box p {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.modal-pin-box input {
+  width: 100%;
+  padding: 10px;
   font-size: 1.1rem;
-  letter-spacing: 2px;
+  text-align: center;
+  letter-spacing: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.modal-pin-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-pin-actions button {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-batal {
+  background-color: #ccc;
+  color: #333;
+}
+
+.btn-konfirmasi {
+  background-color: #2b5b8d;
+  color: white;
 }
 
 /* Footer Banner */
@@ -472,41 +558,5 @@ input[type="file"] {
 
   .panel-ranking {
     min-height: 180px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .main-container {
-    padding: 20px 15px;
-  }
-
-  .header-text h1 {
-    font-size: 1.5rem;
-  }
-  .header-text h2 {
-    font-size: 1.7rem;
-    margin-bottom: 15px;
-  }
-  .logo-img {
-    max-width: 140px;
-  }
-  .sub-header h3 {
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-  }
-  .custom-dropdown {
-    max-width: 280px;
-  }
-  .dropdown-button {
-    padding: 12px 16px;
-    font-size: 0.95rem;
-  }
-
-  .footer-content {
-    width: 80%;
-    max-width: 280px;
-    font-size: 0.8rem;
-    padding: 7px 0;
-    clip-path: polygon(8% 0%, 92% 0%, 100% 100%, 0% 100%);
   }
 }
