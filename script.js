@@ -200,9 +200,8 @@ function closeModal() {
 function handleFormSubmit(event) {
   event.preventDefault();
 
-  const btnSelesai = document.getElementById("btnSelesai");
-  btnSelesai.innerText = "MENGIRIM DATA...";
-  btnSelesai.disabled = true;
+  // Tampilkan loading GIF
+  document.getElementById("loadingOverlay").style.display = "flex";
 
   const fileInput = document.getElementById("fileBukti").files[0];
   const reader = new FileReader();
@@ -243,8 +242,8 @@ function handleFormSubmit(event) {
         alert("Terjadi kesalahan koneksi!");
       })
       .finally(() => {
-        btnSelesai.innerText = "SELESAI";
-        btnSelesai.disabled = false;
+        // Sembunyikan loading GIF
+        document.getElementById("loadingOverlay").style.display = "none";
       });
   };
 
@@ -264,8 +263,8 @@ function resetForm() {
   checkFormStatus();
 }
 
-// --- FUNGSI MODAL PIN DOWNLOAD EXCEL ---
-const KODE_PIN_RAHASIA = "2026"; // PIN rahasia (bisa diubah sesuai keinginan)
+// --- FUNGSI MODAL PIN DOWNLOAD PDF ---
+const KODE_PIN_RAHASIA = "2026"; // PIN rahasia
 
 function bukaModalPin() {
   document.getElementById("modalPinOverlay").style.display = "flex";
@@ -286,10 +285,9 @@ function verifikasiPinDanDownload() {
   }
 
   tutupModalPin();
-  // Langsung download file Excel tanpa memicu izin akun Google
   window.open(
     WEB_APP_URL +
-      "?action=downloadExcel&project=" +
+      "?action=downloadPdf&project=" +
       encodeURIComponent(selectedProjectValue),
     "_blank",
   );

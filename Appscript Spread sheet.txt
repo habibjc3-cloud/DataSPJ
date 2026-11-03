@@ -1,11 +1,10 @@
-// Trigger Otomatis: Dijalankan setiap kali ada perubahan manual di Spreadsheet (seperti hapus baris/edit)
+// Trigger Otomatis: Dijalankan setiap kali ada perubahan manual di Spreadsheet (hapus baris/edit)
 function onEdit(e) {
   try {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheetData = ss.getActiveSheet();
     
-    // Hanya jalankan jika perubahan terjadi di sheet 'SPJ w3'
-    if (sheetData.getName() === "SPJ w3") {
+    if (sheetData.getName() === "SPJ w3" || sheetData.getName().indexOf("JC") !== -1) {
       rapikanDanSusunLampiran(ss, sheetData);
     }
   } catch (err) {
@@ -13,7 +12,7 @@ function onEdit(e) {
   }
 }
 
-// Fungsi Utama Penyusun Ulang Data, Nomor Urut, Sisa Dana, dan Lampiran Foto
+// Fungsi Utama Penyusun Ulang Data, Nomor Urut, Sisa Dana, dan Tinggi Lampiran Foto
 function rapikanDanSusunLampiran(ss, sheetData) {
   var startRow = 8;
   var lastRow = sheetData.getLastRow();
@@ -35,7 +34,7 @@ function rapikanDanSusunLampiran(ss, sheetData) {
     // 2. Rapikan Nomor Urut & Formula Total Harga
     for (var i = 0; i < numRows; i++) {
       var currentRow = startRow + i;
-      sheetData.getRange(currentRow, 1).setValue(i + 1); // Set NO: 1, 2, 3, dst.
+      sheetData.getRange(currentRow, 1).setValue(i + 1);
       sheetData.getRange(currentRow, 10).setFormula("=G" + currentRow + "*I" + currentRow);
     }
 
@@ -57,8 +56,12 @@ function rapikanDanSusunLampiran(ss, sheetData) {
     sheetData.getRange(rowPemasukan, 10, 3, 1).setNumberFormat('"Rp"#,##0');
   }
 
-  // 4. SUSUN ULANG TAB 'Lampiran w3' DARI AWAL
-  var sheetLampiran = ss.getSheetByName("Lampiran w3");
+  // 4. SUSUN ULANG TAB 'Lampiran w3' & OTOMATIS ATUR TINGGI BARIS FOTO
+  var sheetName = sheetData.getName();
+  var lampiranName = sheetName.replace("SPJ", "Lampiran");
+  if (sheetName === "SPJ w3") lampiranName = "Lampiran w3";
+  
+  var sheetLampiran = ss.getSheetByName(lampiranName);
   if (sheetLampiran) {
     var lampiranLastRow = sheetLampiran.getLastRow();
     if (lampiranLastRow >= 1) {
@@ -74,20 +77,43 @@ function rapikanDanSusunLampiran(ss, sheetData) {
         var colIndex = ((noUrut - 1) % 5) + 1;
         var rowIndex = (Math.floor((noUrut - 1) / 5) * 2) + 2;
 
-        sheetLampiran.getRange(rowIndex - 1, colIndex).setValue(noUrut);
+        // Otomatis besarkan tinggi baris foto jadi ... pixel
+        sheetLampiran.setRowHeight(rowIndex, 395);
+
+        sheetLampiran.getRange(rowIndex - 1, colIndex).setValue(noUrut).setHorizontalAlignment("center").setFontWeight("bold");
         if (imgUrlInRow) {
           sheetLampiran.getRange(rowIndex, colIndex).setFormula('=IMAGE("' + imgUrlInRow + '"; 1)');
         }
+        sheetLampiran.getRange(rowIndex - 1, colIndex, 2, 1).setBorder(true, true, true, true, true, true);
       }
     }
   }
 }
 
-// Fungsi doGet untuk Ambil Leaderboard di Web
+// Fungsi doGet (Handle Leaderboard & Download Excel Tanpa Izin OAuth)
 function doGet(e) {
   try {
-    var ss = SpreadsheetApp.openById("1KbUbnh_arBjCjeZ11EqIhDONZQ946vy5otk3XVilLDg");
-    var sheetData = ss.getSheetByName("SPJ w3");
+    var action = e.parameter.action;
+    var projectParam = e.parameter.project || "JC 3";
+    var spreadsheetId = "1KbUbnh_arBjCjeZ11EqIhDONZQ946vy5otk3XVilLDg";
+    
+    // Jika permintaannya adalah Download Excel
+    if (action === "downloadExcel") {
+      var exportUrl = "https://docs.google.com/spreadsheets/d/" + spreadsheetId + "/export?exportFormat=xlsx&format=xlsx";
+      
+      return HtmlService.createHtmlOutput(
+        "<script>" +
+        "window.location.href = '" + exportUrl + "';" +
+        "setTimeout(function(){ window.close(); }, 3000);" +
+        "</script>" +
+        "<p style='font-family:sans-serif; text-align:center; margin-top:50px;'>File Excel sedang didownload, halaman ini akan segera tertutup...</p>"
+      );
+    }
+
+    // Default: Ambil Data Leaderboard
+    var ss = SpreadsheetApp.openById(spreadsheetId);
+    var targetSheetName = (projectParam === "JC 4") ? "SPJ JC 4" : "SPJ w3";
+    var sheetData = ss.getSheetByName(targetSheetName);
     if (!sheetData) sheetData = ss.getSheets()[0];
 
     var startRow = 8;
@@ -121,12 +147,13 @@ function doGet(e) {
     rankingArray.sort(function(a, b) { return b.total - a.total; });
 
     return ContentService.createTextOutput(JSON.stringify({ result: "success", ranking: rankingArray })).setMimeType(ContentService.MimeType.JSON);
+
   } catch (error) {
     return ContentService.createTextOutput(JSON.stringify({ result: "error", error: error.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// Fungsi doPost untuk Upload Baru dari Web
+// Fungsi doPost (Upload Data Baru & Foto ke Drive)
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
@@ -143,7 +170,8 @@ function doPost(e) {
     var imageUrl = "https://drive.google.com/thumbnail?id=" + file.getId() + "&sz=w1000";
 
     var ss = SpreadsheetApp.openById("1KbUbnh_arBjCjeZ11EqIhDONZQ946vy5otk3XVilLDg");
-    var sheetData = ss.getSheetByName("SPJ w3");
+    var targetSheetName = (data.project === "JC 4") ? "SPJ JC 4" : "SPJ w3";
+    var sheetData = ss.getSheetByName(targetSheetName);
     if (!sheetData) sheetData = ss.getSheets()[0];
     
     var startRow = 8;
