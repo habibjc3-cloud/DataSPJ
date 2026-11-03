@@ -221,6 +221,33 @@
       </div>
     </div>
 
+    <!-- MODAL STATUS SUBMIT (LOADING & SELESAI) -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-box">
+        <!-- Tombol X untuk menutup ketika status SELESAI -->
+        <button
+          class="loading-close-btn"
+          id="loadingCloseBtn"
+          onclick="tutupModalStatus()"
+        >
+          &times;
+        </button>
+
+        <!-- Gambar GIF di dalam folder image/ -->
+        <img
+          src="image/loading.gif"
+          alt="Status GIF"
+          class="loading-gif"
+          id="statusGif"
+        />
+
+        <!-- Teks Status bawah -->
+        <p class="status-text" id="statusText" style="display: none">
+          SELESAI!
+        </p>
+      </div>
+    </div>
+
     <!-- MODAL POP-UP INPUT PIN -->
     <div class="modal-pin-overlay" id="modalPinOverlay">
       <div class="modal-pin-box">

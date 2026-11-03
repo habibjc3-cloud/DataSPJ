@@ -3,7 +3,7 @@ const WEB_APP_URL =
 
 // Daftar nama berdasarkan Project
 const projectNames = {
-  "JC 3": ["Habib", "Raditya", "Nur Abdi", "Rizki", "Fahrul", "Yoko"],
+  "JC 3": ["Habib", "Raditya", "Nur Abdi", "Gita", "Fahrul"],
   "JC 4": ["Fakhri", "Roni"],
 };
 
@@ -200,9 +200,15 @@ function closeModal() {
 function handleFormSubmit(event) {
   event.preventDefault();
 
-  const btnSelesai = document.getElementById("btnSelesai");
-  btnSelesai.innerText = "MENGIRIM DATA...";
-  btnSelesai.disabled = true;
+  // 1. Reset tampilan overlay ke mode "LOADING"
+  const imgGif = document.getElementById("statusGif");
+  const closeBtn = document.getElementById("loadingCloseBtn");
+  const textStatus = document.getElementById("statusText");
+
+  imgGif.src = "image/loading.gif";
+  closeBtn.style.display = "none";
+  textStatus.style.display = "none";
+  document.getElementById("loadingOverlay").style.display = "flex";
 
   const fileInput = document.getElementById("fileBukti").files[0];
   const reader = new FileReader();
@@ -230,25 +236,31 @@ function handleFormSubmit(event) {
       .then((res) => res.json())
       .then((data) => {
         if (data.result === "success") {
-          alert("Data dan Nota Berhasil Terupload!");
           resetForm();
           loadRanking();
-          closeModal();
+
+          // 2. Saat sukses, GANTI GIF jadi okee.gif, munculkan tulisan "SELESAI!" & tombol X
+          imgGif.src = "image/okee.gif";
+          textStatus.style.display = "block";
+          closeBtn.style.display = "block";
         } else {
           alert("Gagal menyimpan data: " + data.error);
+          document.getElementById("loadingOverlay").style.display = "none";
         }
       })
       .catch((err) => {
         console.error(err);
         alert("Terjadi kesalahan koneksi!");
-      })
-      .finally(() => {
-        btnSelesai.innerText = "SELESAI";
-        btnSelesai.disabled = false;
+        document.getElementById("loadingOverlay").style.display = "none";
       });
   };
 
   reader.readAsDataURL(fileInput);
+}
+
+function tutupModalStatus() {
+  document.getElementById("loadingOverlay").style.display = "none";
+  closeModal(); // Otomatis menutup juga form modal data
 }
 
 function resetForm() {
@@ -264,8 +276,8 @@ function resetForm() {
   checkFormStatus();
 }
 
-// --- FUNGSI MODAL PIN DOWNLOAD EXCEL ---
-const KODE_PIN_RAHASIA = "2026"; // PIN rahasia (bisa diubah sesuai keinginan)
+// --- FUNGSI MODAL PIN DOWNLOAD PDF ---
+const KODE_PIN_RAHASIA = "2026"; // PIN rahasia
 
 function bukaModalPin() {
   document.getElementById("modalPinOverlay").style.display = "flex";
@@ -286,10 +298,9 @@ function verifikasiPinDanDownload() {
   }
 
   tutupModalPin();
-  // Langsung download file Excel tanpa memicu izin akun Google
   window.open(
     WEB_APP_URL +
-      "?action=downloadExcel&project=" +
+      "?action=downloadPdf&project=" +
       encodeURIComponent(selectedProjectValue),
     "_blank",
   );

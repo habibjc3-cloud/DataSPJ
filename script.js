@@ -3,7 +3,7 @@ const WEB_APP_URL =
 
 // Daftar nama berdasarkan Project
 const projectNames = {
-  "JC 3": ["Habib", "Raditya", "Nur Abdi", "Rizki", "Fahrul", "Yoko"],
+  "JC 3": ["Habib", "Raditya", "Nur Abdi", "Gita", "Fahrul"],
   "JC 4": ["Fakhri", "Roni"],
 };
 
@@ -200,7 +200,14 @@ function closeModal() {
 function handleFormSubmit(event) {
   event.preventDefault();
 
-  // Tampilkan loading GIF
+  // 1. Reset tampilan overlay ke mode "LOADING"
+  const imgGif = document.getElementById("statusGif");
+  const closeBtn = document.getElementById("loadingCloseBtn");
+  const textStatus = document.getElementById("statusText");
+
+  imgGif.src = "image/loading.gif";
+  closeBtn.style.display = "none";
+  textStatus.style.display = "none";
   document.getElementById("loadingOverlay").style.display = "flex";
 
   const fileInput = document.getElementById("fileBukti").files[0];
@@ -229,25 +236,31 @@ function handleFormSubmit(event) {
       .then((res) => res.json())
       .then((data) => {
         if (data.result === "success") {
-          alert("Data dan Nota Berhasil Terupload!");
           resetForm();
           loadRanking();
-          closeModal();
+
+          // 2. Saat sukses, GANTI GIF jadi okee.gif, munculkan tulisan "SELESAI!" & tombol X
+          imgGif.src = "image/kambing.gif";
+          textStatus.style.display = "block";
+          closeBtn.style.display = "block";
         } else {
           alert("Gagal menyimpan data: " + data.error);
+          document.getElementById("loadingOverlay").style.display = "none";
         }
       })
       .catch((err) => {
         console.error(err);
         alert("Terjadi kesalahan koneksi!");
-      })
-      .finally(() => {
-        // Sembunyikan loading GIF
         document.getElementById("loadingOverlay").style.display = "none";
       });
   };
 
   reader.readAsDataURL(fileInput);
+}
+
+function tutupModalStatus() {
+  document.getElementById("loadingOverlay").style.display = "none";
+  closeModal(); // Otomatis menutup juga form modal data
 }
 
 function resetForm() {
